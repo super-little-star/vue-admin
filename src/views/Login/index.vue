@@ -97,7 +97,7 @@ import {
   computed
 } from "@vue/composition-api";
 import val from "../../utils/validate";
-import { GetSms, Register } from "../../api/login";
+import { GetSms, Register, CheckUserRepeat } from "../../api/login";
 import servec from "../../utils/request";
 import service from "../../utils/request";
 export default {
@@ -109,8 +109,7 @@ export default {
       } else if (!val.email(value)) {
         callback(new Error("请输入正确的邮箱"));
       } else {
-        emailInput = true;
-        canGetCode.value = emailInput && !startTimer;
+        emailInput.value = true;
         callback();
       }
     };
@@ -141,7 +140,7 @@ export default {
         callback();
       }
     };
-
+    //----------变量--------------//
     const menuTab = reactive([
       { txt: "登录", current: true },
       { txt: "注册", current: false }
@@ -160,9 +159,12 @@ export default {
       passwords: [{ validator: validatePasswords, trigger: "blur" }],
       code: [{ validator: validateCode, trigger: "blur" }]
     });
-    const canGetCode = ref(false);
-    let startTimer = false;
-    let emailInput = false;
+
+    const canGetCode = computed(() => {
+      return emailInput.value && !startTimer.value;
+    });
+    const startTimer = ref(false);
+    const emailInput = ref(false);
     const btnCodeTitle = ref("获取验证码");
 
     let timer = 60;
@@ -181,21 +183,29 @@ export default {
       clearAllInput();
     };
     const getSms = () => {
-      GetSms({ userEmail: ruleForm.username }, res => {
-        if (res.data.result) {
-          context.root.$message.success(res.data.message);
+      GetSms(
+        {
+          userEmail: ruleForm.username,
+          isRegister: currMenu.value.txt == "注册"
+        },
+        res => {
+          context.root.$message({
+            type: res.data.result ? "success" : "error",
+            message: res.data.message
+          });
         }
-      });
-      startTimer = true;
-      canGetCode.value = emailInput && !startTimer;
+      );
+      //计时器计时
+      startTimer.value = true;
+      //canGetCode.value = emailInput && !startTimer;
       curTime = timer;
       btnCodeTitle.value = curTime + "s";
       interval = setInterval(() => {
         curTime--;
         btnCodeTitle.value = curTime + "s";
         if (curTime <= 0) {
-          startTimer = false;
-          canGetCode.value = emailInput && !startTimer;
+          startTimer.value = false;
+          //canGetCode.value = emailInput && !startTimer;
           btnCodeTitle.value = "重新获取";
           clearInterval(interval);
         }
@@ -206,8 +216,8 @@ export default {
       ruleForm.password = "";
       ruleForm.passwords = "";
       ruleForm.code = "";
-      emailInput = false;
-      canGetCode.value = emailInput && !startTimer;
+      emailInput.value = false;
+      //canGetCode.value = emailInput && !startTimer;
     };
     const submitForm = formName => {
       context.refs[formName].validate(valid => {
@@ -226,8 +236,8 @@ export default {
                 });
                 if (res.data.result) {
                   currMenu.value = menuTab[0];
-                  startTimer = false;
-                  canGetCode.value = emailInput && !startTimer;
+                  startTimer.value = false;
+                  //canGetCode.value = emailInput && !startTimer;
                   btnCodeTitle.value = "获取验证码";
                   ruleForm.code = "";
                   clearInterval(interval);
