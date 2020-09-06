@@ -63,8 +63,12 @@
                   <el-input v-model.number="ruleForm.code"></el-input
                 ></el-col>
                 <el-col :span="10"
-                  ><el-button type="success" class="block"
-                    >获取验证码</el-button
+                  ><el-button
+                    type="success"
+                    class="block"
+                    @click="getSms()"
+                    :disabled="!canGetCode"
+                    >{{ btnCodeTitle }}</el-button
                   ></el-col
                 >
               </el-row>
@@ -85,16 +89,28 @@
   </div>
 </template>
 <script>
+import {
+  reactive,
+  ref,
+  onMounted,
+  watch,
+  computed
+} from "@vue/composition-api";
 import val from "../../utils/validate";
+import { GetSms, Register } from "../../api/login";
+import servec from "../../utils/request";
+import service from "../../utils/request";
 export default {
   name: "login",
-  data() {
+  setup(props, context) {
     var validateUserName = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入用户名"));
       } else if (!val.email(value)) {
         callback(new Error("请输入正确的邮箱"));
       } else {
+        emailInput = true;
+        canGetCode.value = emailInput && !startTimer;
         callback();
       }
     };
@@ -119,66 +135,129 @@ export default {
     var validatePasswords = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value != this.ruleForm.password) {
+      } else if (value != ruleForm.password) {
         callback(new Error("两次输入密码不一致"));
       } else {
         callback();
       }
     };
-    return {
-      currMenu: {},
-      menuTab: [
-        { txt: "登录", current: true },
-        { txt: "注册", current: false }
-      ],
-      //-----------element UI
-      ruleForm: {
-        username: "",
-        password: "",
-        passwords: "",
-        code: ""
-      },
-      rules: {
-        username: [{ validator: validateUserName, trigger: "blur" }],
-        password: [{ validator: validatePassword, trigger: "blur" }],
-        passwords: [{ validator: validatePasswords, trigger: "blur" }],
-        code: [{ validator: validateCode, trigger: "blur" }]
-      }
-    };
+
+    const menuTab = reactive([
+      { txt: "登录", current: true },
+      { txt: "注册", current: false }
+    ]);
+    const currMenu = ref({});
     //-----------element UI
-  },
-  methods: {
-    clearAllInput() {
-      this.ruleForm.username = "";
-      this.ruleForm.password = "";
-      this.ruleForm.passwords = "";
-      this.ruleForm.code = "";
-    },
-    toggleMneu(data) {
-      this.currMenu = data;
-      this.menuTab.forEach(item => {
+    const ruleForm = reactive({
+      username: "",
+      password: "",
+      passwords: "",
+      code: ""
+    });
+    const rules = reactive({
+      username: [{ validator: validateUserName, trigger: "blur" }],
+      password: [{ validator: validatePassword, trigger: "blur" }],
+      passwords: [{ validator: validatePasswords, trigger: "blur" }],
+      code: [{ validator: validateCode, trigger: "blur" }]
+    });
+    const canGetCode = ref(false);
+    let startTimer = false;
+    let emailInput = false;
+    const btnCodeTitle = ref("获取验证码");
+
+    let timer = 60;
+    let curTime = 60;
+    let interval = null;
+    //----------函数--------------//
+    const toggleMneu = data => {
+      currMenu.value = data;
+      menuTab.forEach(item => {
         if (item == data) {
           data.current = true;
         } else {
           item.current = false;
         }
       });
-      this.clearAllInput();
-    },
-    //-----------element UI
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      clearAllInput();
+    };
+    const getSms = () => {
+      GetSms({ userEmail: ruleForm.username }, res => {
+        if (res.data.result) {
+          context.root.$message.success(res.data.message);
+        }
+      });
+      startTimer = true;
+      canGetCode.value = emailInput && !startTimer;
+      curTime = timer;
+      btnCodeTitle.value = curTime + "s";
+      interval = setInterval(() => {
+        curTime--;
+        btnCodeTitle.value = curTime + "s";
+        if (curTime <= 0) {
+          startTimer = false;
+          canGetCode.value = emailInput && !startTimer;
+          btnCodeTitle.value = "重新获取";
+          clearInterval(interval);
+        }
+      }, 1000);
+    };
+    const clearAllInput = () => {
+      ruleForm.username = "";
+      ruleForm.password = "";
+      ruleForm.passwords = "";
+      ruleForm.code = "";
+      emailInput = false;
+      canGetCode.value = emailInput && !startTimer;
+    };
+    const submitForm = formName => {
+      context.refs[formName].validate(valid => {
         if (valid) {
-          alert("submit!");
+          if (currMenu.value.txt == "注册") {
+            Register(
+              {
+                userEmail: ruleForm.username,
+                password: ruleForm.password,
+                code: ruleForm.code
+              },
+              res => {
+                context.root.$message({
+                  type: res.data.result ? "success" : "warning",
+                  message: res.data.message
+                });
+                if (res.data.result) {
+                  currMenu.value = menuTab[0];
+                  startTimer = false;
+                  canGetCode.value = emailInput && !startTimer;
+                  btnCodeTitle.value = "获取验证码";
+                  ruleForm.code = "";
+                  clearInterval(interval);
+                }
+              }
+            );
+          }
         } else {
-          console.log("error submit!!");
+          context.root.$message.error("请填入正确信息");
           return false;
         }
       });
-    }
-  },
-  beforeMount() {
-    this.currMenu = this.menuTab[0];
+    };
+
+    //----------生命周期--------------//
+    onMounted(() => {
+      currMenu.value = menuTab[0];
+    });
+
+    return {
+      currMenu,
+      menuTab,
+      toggleMneu,
+      submitForm,
+      ruleForm,
+      rules,
+      getSms,
+      canGetCode,
+      btnCodeTitle
+    };
   }
 };
 </script>

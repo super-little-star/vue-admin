@@ -26,7 +26,7 @@ validate.password = function(s) {
   return reg.test(s);
 };
 validate.code = function(s) {
-  let reg = /^[a-z0-9]{6}$/;
+  let reg = /^[a-zA-Z]{6}$/;
   return reg.test(s);
 };
 
