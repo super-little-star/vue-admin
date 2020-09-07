@@ -3,7 +3,7 @@ import { Message } from "element-ui";
 
 const service = axios.create({
   baseURL: "http://localhost:3000",
-  timeout: 1000,
+  timeout: 5000,
   headers: {
     "X-Custom-Header": "foobar",
     "Content-Type": "application/json",
@@ -29,7 +29,13 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   function(response) {
     //响应数据处理
-    return response;
+    let data = response.data;
+    if (data.result == false) {
+      Message.error(data.message);
+      return Promise.reject(data);
+    } else {
+      return data;
+    }
   },
   function(error) {
     //响应错误处理

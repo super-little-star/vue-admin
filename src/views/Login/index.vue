@@ -56,7 +56,11 @@
               ></el-input>
             </el-form-item>
 
-            <el-form-item prop="code" class="item-from">
+            <el-form-item
+              prop="code"
+              class="item-from"
+              v-if="currMenu.txt == '注册'"
+            >
               <label>验证码</label>
               <el-row :gutter="11">
                 <el-col :span="14">
@@ -97,7 +101,7 @@ import {
   computed
 } from "@vue/composition-api";
 import val from "../../utils/validate";
-import { GetSms, Register, CheckUserRepeat } from "../../api/login";
+import { GetSms, Register } from "../../api/login";
 import servec from "../../utils/request";
 import service from "../../utils/request";
 export default {
@@ -161,10 +165,11 @@ export default {
     });
 
     const canGetCode = computed(() => {
-      return emailInput.value && !startTimer.value;
+      return emailInput.value && !startTimer.value && !GettingCode.value;
     });
     const startTimer = ref(false);
     const emailInput = ref(false);
+    const GettingCode = ref(false);
     const btnCodeTitle = ref("获取验证码");
 
     let timer = 60;
@@ -183,18 +188,21 @@ export default {
       clearAllInput();
     };
     const getSms = () => {
-      GetSms(
-        {
-          userEmail: ruleForm.username,
-          isRegister: currMenu.value.txt == "注册"
-        },
-        res => {
+      GettingCode.value = true;
+      GetSms({
+        userEmail: ruleForm.username,
+        isRegister: currMenu.value.txt == "注册"
+      })
+        .then(data => {
+          GettingCode.value = false;
           context.root.$message({
-            type: res.data.result ? "success" : "error",
-            message: res.data.message
+            type: "success",
+            message: data.message
           });
-        }
-      );
+        })
+        .catch(data => {
+          stopTimer();
+        });
       //计时器计时
       startTimer.value = true;
       //canGetCode.value = emailInput && !startTimer;
@@ -204,18 +212,12 @@ export default {
         curTime--;
         btnCodeTitle.value = curTime + "s";
         if (curTime <= 0) {
-          startTimer.value = false;
-          //canGetCode.value = emailInput && !startTimer;
-          btnCodeTitle.value = "重新获取";
-          clearInterval(interval);
+          stopTimer();
         }
       }, 1000);
     };
     const clearAllInput = () => {
-      ruleForm.username = "";
-      ruleForm.password = "";
-      ruleForm.passwords = "";
-      ruleForm.code = "";
+      context.refs["ruleForm"].resetFields();
       emailInput.value = false;
       //canGetCode.value = emailInput && !startTimer;
     };
@@ -223,33 +225,28 @@ export default {
       context.refs[formName].validate(valid => {
         if (valid) {
           if (currMenu.value.txt == "注册") {
-            Register(
-              {
-                userEmail: ruleForm.username,
-                password: ruleForm.password,
-                code: ruleForm.code
-              },
-              res => {
-                context.root.$message({
-                  type: res.data.result ? "success" : "warning",
-                  message: res.data.message
-                });
-                if (res.data.result) {
-                  currMenu.value = menuTab[0];
-                  startTimer.value = false;
-                  //canGetCode.value = emailInput && !startTimer;
-                  btnCodeTitle.value = "获取验证码";
-                  ruleForm.code = "";
-                  clearInterval(interval);
-                }
-              }
-            );
+            Register({
+              userEmail: ruleForm.username,
+              password: ruleForm.password,
+              code: ruleForm.code
+            }).then(data => {
+              context.root.$message.success(data.message);
+              toggleMneu(menuTab[0]);
+              stopTimer();
+            });
           }
         } else {
           context.root.$message.error("请填入正确信息");
           return false;
         }
       });
+    };
+    const stopTimer = () => {
+      startTimer.value = false;
+      //canGetCode.value = emailInput && !startTimer;
+      btnCodeTitle.value = "获取验证码";
+      ruleForm.code = "";
+      clearInterval(interval);
     };
 
     //----------生命周期--------------//

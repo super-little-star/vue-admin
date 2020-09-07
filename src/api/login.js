@@ -1,23 +1,19 @@
 import service from "../utils/request";
 
-export function GetSms(user, callback) {
+export function GetSms(user) {
   let d = {
     method: "post",
     url: "/getSms",
     data: user
   };
-  service.request(d).then(function(res) {
-    callback(res);
-  });
+  return service.request(d);
 }
 
-export function Register(data, callback) {
+export function Register(data) {
   let d = {
     method: "post",
     url: "/register",
     data
   };
-  service.request(d).then(function(res) {
-    callback(res);
-  });
+  return service.request(d);
 }
