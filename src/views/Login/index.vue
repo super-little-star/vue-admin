@@ -104,6 +104,7 @@ import val from "../../utils/validate";
 import { GetSms, Login, Register } from "../../api/login";
 import servec from "../../utils/request";
 import service from "../../utils/request";
+var sha1 = require("js-sha1");
 export default {
   name: "login",
   setup(props, context) {
@@ -172,7 +173,6 @@ export default {
     const GettingCode = ref(false);
     const btnCodeTitle = ref("获取验证码");
 
-    let timer = 60;
     let curTime = 60;
     let interval = null;
 
@@ -189,6 +189,7 @@ export default {
       clearAllInput();
     };
 
+    //获取验证码
     const getSms = () => {
       GettingCode.value = true;
       GetSms({
@@ -196,15 +197,16 @@ export default {
       })
         .then(data => {
           GettingCode.value = false;
-          context.root.$message({
-            type: "success",
-            message: data.message
-          });
         })
         .catch(data => {
           GettingCode.value = false;
           stopTimer();
         });
+      codeTimer(60);
+    };
+
+    //计时器
+    const codeTimer = timer => {
       //计时器计时
       startTimer.value = true;
       curTime = timer;
@@ -218,11 +220,19 @@ export default {
       }, 1000);
     };
 
+    //清空表单
     const clearAllInput = () => {
       context.refs["ruleForm"].resetFields();
       emailInput.value = false;
     };
+    const stopTimer = () => {
+      startTimer.value = false;
+      btnCodeTitle.value = "获取验证码";
+      ruleForm.code = "";
+      clearInterval(interval);
+    };
 
+    //提交表单
     const submitForm = formName => {
       context.refs[formName].validate(valid => {
         if (valid) {
@@ -238,30 +248,24 @@ export default {
       });
     };
 
-    const stopTimer = () => {
-      startTimer.value = false;
-      btnCodeTitle.value = "获取验证码";
-      ruleForm.code = "";
-      clearInterval(interval);
-    };
-
+    //发送注册请求
     const sendRegister = () => {
       Register({
         userEmail: ruleForm.username,
-        password: ruleForm.password,
+        password: sha1(ruleForm.password),
         code: ruleForm.code
       }).then(data => {
-        context.root.$message.success(data.message);
         toggleMneu(menuTab[0]);
 
         stopTimer();
       });
     };
 
+    //发送登录请求
     const sendLogin = () => {
       Login({
         userEmail: ruleForm.username,
-        password: ruleForm.password
+        password: sha1(ruleForm.password)
       });
     };
     //----------生命周期--------------//
