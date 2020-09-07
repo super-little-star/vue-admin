@@ -31,9 +31,15 @@ service.interceptors.response.use(
     //响应数据处理
     let data = response.data;
     if (data.result == false) {
-      Message.error(data.message);
+      if (data.message != "") {
+        Message.error(data.message);
+      }
       return Promise.reject(data);
     } else {
+      if (data.message != "") {
+        Message.success(data.message);
+      }
+
       return data;
     }
   },

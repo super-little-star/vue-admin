@@ -101,7 +101,7 @@ import {
   computed
 } from "@vue/composition-api";
 import val from "../../utils/validate";
-import { GetSms, Register } from "../../api/login";
+import { GetSms, Login, Register } from "../../api/login";
 import servec from "../../utils/request";
 import service from "../../utils/request";
 export default {
@@ -175,6 +175,7 @@ export default {
     let timer = 60;
     let curTime = 60;
     let interval = null;
+
     //----------函数--------------//
     const toggleMneu = data => {
       currMenu.value = data;
@@ -187,11 +188,11 @@ export default {
       });
       clearAllInput();
     };
+
     const getSms = () => {
       GettingCode.value = true;
       GetSms({
-        userEmail: ruleForm.username,
-        isRegister: currMenu.value.txt == "注册"
+        userEmail: ruleForm.username
       })
         .then(data => {
           GettingCode.value = false;
@@ -201,11 +202,11 @@ export default {
           });
         })
         .catch(data => {
+          GettingCode.value = false;
           stopTimer();
         });
       //计时器计时
       startTimer.value = true;
-      //canGetCode.value = emailInput && !startTimer;
       curTime = timer;
       btnCodeTitle.value = curTime + "s";
       interval = setInterval(() => {
@@ -216,24 +217,19 @@ export default {
         }
       }, 1000);
     };
+
     const clearAllInput = () => {
       context.refs["ruleForm"].resetFields();
       emailInput.value = false;
-      //canGetCode.value = emailInput && !startTimer;
     };
+
     const submitForm = formName => {
       context.refs[formName].validate(valid => {
         if (valid) {
           if (currMenu.value.txt == "注册") {
-            Register({
-              userEmail: ruleForm.username,
-              password: ruleForm.password,
-              code: ruleForm.code
-            }).then(data => {
-              context.root.$message.success(data.message);
-              toggleMneu(menuTab[0]);
-              stopTimer();
-            });
+            sendRegister();
+          } else if (currMenu.value.txt == "登录") {
+            sendLogin();
           }
         } else {
           context.root.$message.error("请填入正确信息");
@@ -241,14 +237,33 @@ export default {
         }
       });
     };
+
     const stopTimer = () => {
       startTimer.value = false;
-      //canGetCode.value = emailInput && !startTimer;
       btnCodeTitle.value = "获取验证码";
       ruleForm.code = "";
       clearInterval(interval);
     };
 
+    const sendRegister = () => {
+      Register({
+        userEmail: ruleForm.username,
+        password: ruleForm.password,
+        code: ruleForm.code
+      }).then(data => {
+        context.root.$message.success(data.message);
+        toggleMneu(menuTab[0]);
+
+        stopTimer();
+      });
+    };
+
+    const sendLogin = () => {
+      Login({
+        userEmail: ruleForm.username,
+        password: ruleForm.password
+      });
+    };
     //----------生命周期--------------//
     onMounted(() => {
       currMenu.value = menuTab[0];
@@ -272,6 +287,7 @@ export default {
 #login {
   height: 100vh;
   background: #344a5f;
+  padding-top: 50px;
 }
 .login-wrap {
   width: 330px;

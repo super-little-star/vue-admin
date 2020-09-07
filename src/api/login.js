@@ -17,3 +17,12 @@ export function Register(data) {
   };
   return service.request(d);
 }
+
+export function Login(data) {
+  let d = {
+    method: "post",
+    url: "/getLogin",
+    data
+  };
+  return service.request(d);
+}
