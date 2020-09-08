@@ -1,27 +1,93 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Layout from "@v/Layout/index.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    redirect: "login"
+    redirect: "login",
+    hidden: true,
+    meta: {
+      name: "主页",
+      icon: "el-icon-s-help"
+    }
   },
   {
     path: "/login",
     name: "login",
-    component: () => import("../views/Login/index.vue")
+    hidden: true,
+    meta: {
+      name: "登录",
+      icon: "el-icon-lock"
+    },
+    component: () => import("@v/Login/index.vue")
   },
   {
     path: "/console",
     name: "console",
-    component: () => import("../views/Layout/index.vue"),
+    redirect: "index",
+    meta: {
+      name: "控制台",
+      icon: "el-icon-monitor"
+    },
+    component: Layout,
     children: [
       {
-        path: "/console",
-        name: "console",
-        component: () => import("../views/Console/index.vue")
+        path: "/index",
+        name: "indxe",
+        meta: {
+          name: "首页",
+          icon: "el-icon-star-on"
+        },
+        component: () => import("@v/Console/index.vue")
+      }
+    ]
+  },
+  {
+    path: "/info",
+    name: "info",
+    meta: {
+      name: "信息管理",
+      icon: "el-icon-document"
+    },
+    component: Layout,
+    children: [
+      {
+        path: "/infolist",
+        name: "infolist",
+        meta: {
+          name: "信息列表"
+        },
+        component: () => import("@v/Info/infoList.vue")
+      },
+      {
+        path: "/infoCategory",
+        name: "infoCategory",
+        meta: {
+          name: "信息分类"
+        },
+        component: () => import("@v/Info/category.vue")
+      }
+    ]
+  },
+  {
+    path: "/user",
+    name: "user",
+    meta: {
+      name: "用户管理",
+      icon: "el-icon-s-custom"
+    },
+    component: Layout,
+    children: [
+      {
+        path: "/userlist",
+        name: "userlist",
+        meta: {
+          name: "用户列表"
+        },
+        component: () => import("@v/User/userList.vue")
       }
     ]
   }

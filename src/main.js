@@ -10,7 +10,7 @@ Vue.use(ElementUI);
 Vue.use(VueCompositionApi);
 
 Vue.config.productionTip = false;
-
+//runtime模式
 new Vue({
   router,
   store,

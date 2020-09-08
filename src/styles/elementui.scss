@@ -1,0 +1,7 @@
+.el-menu-item{
+    &.is-active {
+        background-color: #f56c6c !important;
+        color: #fff;
+    }
+    font-size: 14px ;
+}
