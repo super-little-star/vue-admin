@@ -266,6 +266,10 @@ export default {
       Login({
         userEmail: ruleForm.username,
         password: sha1(ruleForm.password)
+      }).then(data => {
+        context.root.$router.push({
+          name: "console"
+        });
       });
     };
     //----------生命周期--------------//
