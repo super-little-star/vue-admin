@@ -8,13 +8,26 @@ module.exports = {
       }
     }
   },
+  chainWebpack: config => {
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+    svgRule
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]",
+        include: ["./src/Icon"]
+      });
+  },
   configureWebpack: config => {
     config.resolve = {
       extensions: [".js", ".json", ".vue"],
       alias: {
         "@": path.resolve(__dirname, "./src"),
         "@c": path.resolve(__dirname, "./src/components"),
-        "@v": path.resolve(__dirname, "./src/views")
+        "@v": path.resolve(__dirname, "./src/views"),
+        // eslint-disable-next-line prettier/prettier
+        "vue": "vue/dist/vue.js"
       }
     };
   }

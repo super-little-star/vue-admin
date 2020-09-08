@@ -30,7 +30,7 @@ const routes = [
     redirect: "index",
     meta: {
       name: "控制台",
-      icon: "el-icon-monitor"
+      icon: "console"
     },
     component: Layout,
     children: [
@@ -50,7 +50,7 @@ const routes = [
     name: "info",
     meta: {
       name: "信息管理",
-      icon: "el-icon-document"
+      icon: "info"
     },
     component: Layout,
     children: [
@@ -77,7 +77,7 @@ const routes = [
     name: "user",
     meta: {
       name: "用户管理",
-      icon: "el-icon-s-custom"
+      icon: "user"
     },
     component: Layout,
     children: [

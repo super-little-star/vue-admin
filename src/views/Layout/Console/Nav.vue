@@ -13,7 +13,7 @@
       <template v-for="(item, index) in routers">
         <el-submenu v-if="!item.hidden" :key="item.id" :index="index + ''">
           <template slot="title">
-            <i :class="item.meta.icon"></i>
+            <svg-icon :iconClass="item.meta.icon" :className="item.meta.icon" />
             <span slot="title">{{ item.meta.name }}</span>
           </template>
 
@@ -35,7 +35,6 @@ export default {
   setup(props, { root }) {
     const isCollapse = ref(false);
     const routers = reactive(root.$router.options.routes);
-    console.log(routers);
 
     const handleOpen = (key, keyPath) => {};
     const handleClose = (key, keyPath) => {};
@@ -62,6 +61,5 @@ export default {
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: $navMenu;
-  min-height: 400px;
 }
 </style>
