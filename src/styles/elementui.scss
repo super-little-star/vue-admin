@@ -1,7 +1,12 @@
+.el-submenu__title{
+    border-bottom: 1px solid #2c3e50 !important;
+    padding-left: 8px !important;
+}
 .el-menu-item{
     &.is-active {
         background-color: #f56c6c !important;
         color: #fff;
     }
     font-size: 14px ;
+    border-bottom: 1px solid #2c3e50;
 }

@@ -1,9 +1,14 @@
 @import "./config.scss";
 @import "./elementui.scss";
+@import "./svg.scss";
+
+.pull-left{float: left;}
+.pull-right{float: right;}
 
 body{
     margin: 0;
     font-family: "Microsoft YaHei";
     font-weight: 300;
     font-size: 12px;
+    background-color:#ededed;
 }

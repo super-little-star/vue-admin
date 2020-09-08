@@ -1,6 +1,10 @@
 <template>
   <div id="main-wrap">
-    <router-view />
+    <div class="main-content">
+      <div class="content">
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -9,16 +13,35 @@ export default {};
 </script>
 
 <style lang="scss" scoped>
-@import "../../../styles/config.scss";
+@import "@s/config.scss";
 #main-wrap {
-  position: fixed;
-  left: $navMenu;
-  top: 75px;
-  right: 0px;
-  bottom: 0px;
-  border: 30px solid #f7f7f7;
-  border-bottom: 0px;
-
+  height: 100vh;
+}
+.main-content {
+  width: 100%;
+  height: 100%;
+  padding-top: $layoutHeader + 30;
+  padding-left: $navMenu + 30;
+  padding-right: 30px;
   box-sizing: border-box;
+}
+.content {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+.open {
+  .main-content {
+    padding-left: $navMenu + 30;
+    transition: all 0.3s ease-in 0s;
+  }
+}
+.close {
+  .main-content {
+    padding-left: $navMenuMin + 30;
+    transition: all 0.3s ease-out 0s;
+  }
 }
 </style>

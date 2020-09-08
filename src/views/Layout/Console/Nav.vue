@@ -1,5 +1,8 @@
 <template>
   <div id="nav-wrap">
+    <div class="logo" align="center">
+      <svg-icon iconClass="logo" className="mylogo" />
+    </div>
     <el-menu
       default-active="1-4-1"
       class="el-menu-vertical-demo"
@@ -30,10 +33,12 @@
 </template>
 
 <script>
-import { reactive, ref } from "@vue/composition-api";
+import { computed, reactive, ref } from "@vue/composition-api";
 export default {
   setup(props, { root }) {
-    const isCollapse = ref(false);
+    const isCollapse = computed(() => {
+      return root.$store.state.isCollapse;
+    });
     const routers = reactive(root.$router.options.routes);
 
     const handleOpen = (key, keyPath) => {};
@@ -50,7 +55,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../styles/config.scss";
+@import "@s/config.scss";
 #nav-wrap {
   position: fixed;
   top: 0%;
@@ -58,7 +63,41 @@ export default {
   height: 100vh;
   width: $navMenu;
   background: #344a5f;
+
+  overflow: hidden;
 }
+
+.logo {
+  border-bottom: 1px solid #263646;
+  svg {
+    font-size: 80px;
+  }
+}
+
+.open {
+  #nav-wrap {
+    width: $navMenu;
+    transition: all 0.3s ease-in 0s;
+    .logo {
+      svg {
+        transition: all 0.3s ease-in 0s;
+      }
+    }
+  }
+}
+.close {
+  #nav-wrap {
+    width: $navMenuMin;
+    transition: all 0.3s ease-out 0s;
+  }
+  .logo {
+    svg {
+      font-size: 40px;
+      transition: all 0.3s ease-out 0s;
+    }
+  }
+}
+
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: $navMenu;
 }

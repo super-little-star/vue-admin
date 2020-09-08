@@ -38,14 +38,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.svg-icon {
-  width: 1em;
-  height: 1em;
-  fill: currentColor;
-  font-size: 25px;
-  color: #fff;
-  padding: 10px;
-}
-</style>
