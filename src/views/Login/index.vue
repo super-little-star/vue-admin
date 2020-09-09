@@ -264,7 +264,7 @@ export default {
     //发送登录请求
     const sendLogin = () => {
       context.root.$store
-        .dispatch("login", {
+        .dispatch("app/login", {
           userEmail: ruleForm.username,
           password: sha1(ruleForm.password)
         })

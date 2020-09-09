@@ -8,7 +8,7 @@
         <div class="pull-left header-icon">
           <svg-icon iconClass="headerIcon" className="headerIcon" />
         </div>
-        <div class="pull-left">管理员</div>
+        <div class="pull-left">{{ userEmail }}</div>
       </div>
       <div class="pull-left header-icon">
         <svg-icon iconClass="logout" className="logout" />
@@ -18,13 +18,16 @@
 </template>
 
 <script>
+import { computed } from "@vue/composition-api";
 export default {
   setup(props, { root }) {
+    const userEmail = computed(() => root.$store.state.app.userEmail);
     const clickMenu = function() {
       root.$store.commit("app/SetCollapse");
     };
     return {
-      clickMenu
+      clickMenu,
+      userEmail
     };
   }
 };
@@ -58,6 +61,7 @@ export default {
   + .header-icon {
     padding: 10px 5px;
   }
+  cursor: pointer;
 }
 
 .open {

@@ -7,6 +7,7 @@ router.beforeEach((to, from, next) => {
   console.log(to.path);
   if (GetToken()) {
     console.log("have token");
+    next();
   } else {
     console.log("token undefind");
     if (whiteRouter.indexOf(to.path) !== -1) next();
