@@ -10,3 +10,12 @@
     font-size: 14px ;
     border-bottom: 1px solid #2c3e50;
 }
+
+div.el-table{
+    td,th{
+        text-align: center;
+    }
+    th{
+        font-weight: bold;
+    }
+}

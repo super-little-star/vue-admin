@@ -1,11 +1,250 @@
 <template>
-  <div>信息列表</div>
+  <div>
+    <el-form :inline="true" :model="searchFormInline" class="searchForm">
+      <el-form-item label="类型：" class="type">
+        <el-select v-model="typeValue" placeholder="请选择">
+          <el-option
+            v-for="item in typeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="日期：" class="date">
+        <el-date-picker
+          v-model="dateValue"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+        >
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="关键字" class="keyword">
+        <el-select v-model="keywordVal" placeholder="请选择">
+          <el-option
+            v-for="item in keywordOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+        <el-input v-model="contentVal" placeholder="请输入搜索内容"></el-input>
+        <el-button type="primary" icon="el-icon-search">搜索</el-button>
+      </el-form-item>
+      <el-form-item class="addbtn">
+        <el-button type="primary" icon="el-icon-plus">添加</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-table :data="tableData" border style="width: 100%">
+      <el-table-column type="selection" width="40"> </el-table-column>
+      <el-table-column prop="title" label="标题"> </el-table-column>
+      <el-table-column prop="type" label="类型" width="130"> </el-table-column>
+      <el-table-column prop="date" label="日期" width="137"> </el-table-column>
+      <el-table-column prop="manager" label="管理人" width="115">
+      </el-table-column>
+
+      <el-table-column label="操作" width="150">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="success"
+            @click="handleEdit(scope.$index, scope.row)"
+            >编辑</el-button
+          >
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.$index, scope.row)"
+            >删除</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-row class="bottom">
+      <el-col :span="8"><el-button>批量删除</el-button></el-col>
+      <el-col :span="16"
+        ><el-pagination
+          class="pull-right"
+          background
+          layout="total,jumper, prev, pager, next"
+          @current-change="handleCurrentChange"
+          :total="1000"
+        >
+        </el-pagination
+      ></el-col>
+    </el-row>
+  </div>
 </template>
 <script>
+import { reactive, ref } from "@vue/composition-api";
 export default {
   name: "infolist",
-  setup() {}
+  setup() {
+    //搜索表单
+    const searchFormInline = reactive({
+      type: "",
+      date: "",
+      keyword: "",
+      content: ""
+    });
+    //类型选择器
+    const typeOptions = reactive([
+      {
+        value: 1,
+        label: "国际信息"
+      },
+      {
+        value: 2,
+        label: "国内信息"
+      },
+      {
+        value: 3,
+        label: "行业信息"
+      }
+    ]);
+    const typeValue = ref("");
+    //关键字选择器
+    const keywordOptions = reactive([
+      {
+        value: "id",
+        label: "ID"
+      },
+      {
+        value: "title",
+        label: "标题"
+      }
+    ]);
+    const keywordVal = ref("id");
+    //日期选择器
+    const pickerOptions = reactive({
+      shortcuts: [
+        {
+          text: "最近一周",
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit("pick", [start, end]);
+          }
+        },
+        {
+          text: "最近一个月",
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit("pick", [start, end]);
+          }
+        },
+        {
+          text: "最近三个月",
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit("pick", [start, end]);
+          }
+        }
+      ]
+    });
+    const dateValue = ref("");
+    //输入内容
+    const contentVal = ref("");
+    //表格
+    const tableData = reactive([
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      }
+    ]);
+
+    //分页
+    const handleCurrentChange = val => {
+      console.log(val);
+    };
+
+    return {
+      typeOptions,
+      typeValue,
+      pickerOptions,
+      dateValue,
+      searchFormInline,
+      keywordOptions,
+      keywordVal,
+      contentVal,
+      tableData,
+      handleCurrentChange
+    };
+  }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import "@s/config.scss";
+.searchForm {
+  display: flex;
+  justify-content: flex-start;
+  .el-button--primary {
+    background-color: $subColor;
+    border-color: $subColor;
+  }
+}
+.keyword {
+  padding-left: 15px;
+  display: flex;
+  justify-content: flex-start;
+  .el-input {
+    width: 150px;
+    margin-right: 5px;
+  }
+  .el-select {
+    width: 80px;
+    margin-right: 5px;
+  }
+}
+.type {
+  .el-select {
+    width: 150px;
+  }
+}
+.date {
+  padding-left: 15px;
+  .el-date-editor--daterange.el-input__inner {
+    width: 250px;
+  }
+}
+.addbtn {
+  position: fixed;
+  right: 40px;
+}
+.bottom {
+  margin-top: 20px;
+}
+</style>
