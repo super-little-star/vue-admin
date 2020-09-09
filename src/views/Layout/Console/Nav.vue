@@ -37,7 +37,7 @@ import { computed, reactive, ref } from "@vue/composition-api";
 export default {
   setup(props, { root }) {
     const isCollapse = computed(() => {
-      return root.$store.state.isCollapse;
+      return root.$store.state.app.isCollapse;
     });
     const routers = reactive(root.$router.options.routes);
 

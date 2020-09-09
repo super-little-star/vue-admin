@@ -263,14 +263,16 @@ export default {
 
     //发送登录请求
     const sendLogin = () => {
-      Login({
-        userEmail: ruleForm.username,
-        password: sha1(ruleForm.password)
-      }).then(data => {
-        context.root.$router.push({
-          name: "console"
+      context.root.$store
+        .dispatch("login", {
+          userEmail: ruleForm.username,
+          password: sha1(ruleForm.password)
+        })
+        .then(data => {
+          context.root.$router.push({
+            name: "console"
+          });
         });
-      });
     };
     //----------生命周期--------------//
     onMounted(() => {

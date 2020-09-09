@@ -21,7 +21,7 @@
 export default {
   setup(props, { root }) {
     const clickMenu = function() {
-      root.$store.commit("SetCollapse");
+      root.$store.commit("app/SetCollapse");
     };
     return {
       clickMenu

@@ -3,16 +3,10 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
+import app from "./modules/app";
+
 export default new Vuex.Store({
-  state: {
-    isCollapse: false
-  },
-  getters: {},
-  mutations: {
-    SetCollapse(state) {
-      state.isCollapse = !state.isCollapse;
-    }
-  },
-  actions: {},
-  modules: {}
+  modules: {
+    app
+  }
 });
