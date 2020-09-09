@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Message } from "element-ui";
 
 const service = axios.create({
   baseURL: "http://localhost:3000",
@@ -31,15 +30,8 @@ service.interceptors.response.use(
     //响应数据处理
     let data = response.data;
     if (data.result == false) {
-      if (data.message != "") {
-        Message.error(data.message);
-      }
       return Promise.reject(data);
     } else {
-      if (data.message != "") {
-        Message.success(data.message);
-      }
-
       return data;
     }
   },

@@ -104,6 +104,7 @@ import val from "../../utils/validate";
 import { GetSms, Login, Register } from "../../api/login";
 import servec from "../../utils/request";
 import service from "../../utils/request";
+import { Message } from "element-ui";
 var sha1 = require("js-sha1");
 export default {
   name: "login",
@@ -254,11 +255,15 @@ export default {
         userEmail: ruleForm.username,
         password: sha1(ruleForm.password),
         code: ruleForm.code
-      }).then(data => {
-        toggleMneu(menuTab[0]);
-
-        stopTimer();
-      });
+      })
+        .then(data => {
+          toggleMneu(menuTab[0]);
+          Message.success(data.message);
+          stopTimer();
+        })
+        .catch(data => {
+          Message.error(data.message);
+        });
     };
 
     //发送登录请求
@@ -269,9 +274,13 @@ export default {
           password: sha1(ruleForm.password)
         })
         .then(data => {
+          Message.success(data.message);
           context.root.$router.push({
             name: "console"
           });
+        })
+        .catch(data => {
+          Message.error(data.message);
         });
     };
     //----------生命周期--------------//
