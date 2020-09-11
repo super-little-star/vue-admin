@@ -37,7 +37,12 @@
         <el-button type="primary" icon="el-icon-search">搜索</el-button>
       </el-form-item>
       <el-form-item class="addbtn">
-        <el-button type="primary" icon="el-icon-plus">添加</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="dialogVisible = true"
+          >添加</el-button
+        >
       </el-form-item>
     </el-form>
 
@@ -80,12 +85,16 @@
         </el-pagination
       ></el-col>
     </el-row>
+
+    <addInfoDialog :dialogVisible.sync="dialogVisible" />
   </div>
 </template>
 <script>
 import { reactive, ref } from "@vue/composition-api";
+import addInfoDialog from "@c/Info/addInfoDialog";
 export default {
   name: "infolist",
+  components: { addInfoDialog },
   setup() {
     //搜索表单
     const searchFormInline = reactive({
@@ -190,7 +199,11 @@ export default {
       console.log(val);
     };
 
+    //弹窗
+    const dialogVisible = ref(false);
+
     return {
+      dialogVisible,
       typeOptions,
       typeValue,
       pickerOptions,

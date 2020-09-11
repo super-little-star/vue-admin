@@ -19,3 +19,20 @@ div.el-table{
         font-weight: bold;
     }
 }
+
+.el-dialog__body {
+    padding: 30px 50px !important;
+}
+
+.el-form{
+    .el-form-item:last-child{
+        margin-bottom: 0 !important;
+    }
+}
+
+.el-dialog__footer{
+    text-align: center !important;
+    .el-button + .el-button{
+        margin-left: 22px;
+    }
+}
