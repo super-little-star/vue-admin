@@ -19,11 +19,26 @@
                 <svg-icon iconClass="plus" className="plus"></svg-icon>
                 {{ item.txt }}
                 <div class="btn-group">
-                  <el-button type="danger" size="mini" round>编辑</el-button>
+                  <el-button
+                    type="danger"
+                    size="mini"
+                    round
+                    @click="revise(item)"
+                    >编辑</el-button
+                  >
                   <!-- <el-button type="success" size="mini" round
                     >添加子级</el-button
                   > -->
-                  <el-button size="mini" round>删除</el-button>
+                  <template>
+                    <el-popconfirm
+                      title="确定删除次分类吗？"
+                      @onConfirm="sendRemoveCategory(item.id)"
+                    >
+                      <el-button slot="reference" size="mini" round
+                        >删除</el-button
+                      >
+                    </el-popconfirm>
+                  </template>
                 </div>
               </h4>
               <!-- <ul>
@@ -55,7 +70,7 @@
               <el-input v-model="formLabelAlign.categoryName"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="danger" @click="addCategory">确定</el-button>
+              <el-button type="danger" @click="addCategory">添加</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -65,7 +80,12 @@
 </template>
 <script>
 import { onMounted, reactive, ref } from "@vue/composition-api";
-import { addFirstCategory, getCategory } from "@/api/Info";
+import {
+  addFirstCategory,
+  getCategory,
+  reviseCategory,
+  removeCategory
+} from "@/api/Info";
 export default {
   name: "infoCategory",
   setup(props, { root }) {
@@ -83,7 +103,8 @@ export default {
       })
         .then(data => {
           root.$message.success(data.message);
-          root.$router.push({ name: "infoCategory" });
+          formLabelAlign.categoryName = "";
+          sendGetCategory();
         })
         .catch(data => {
           root.$message.error(data.message);
@@ -96,10 +117,38 @@ export default {
       });
     };
 
+    const revise = function(cat) {
+      root
+        .$prompt("修改分类：" + cat.txt, "提示", {
+          confirmButtonText: "修改",
+          cancelButtonText: "取消"
+        })
+        .then(({ value }) => {
+          reviseCategory({
+            id: cat.id,
+            txt: value
+          }).then(data => {
+            root.$message.success(data.message);
+            cat.txt = value;
+          });
+        });
+    };
+
+    const sendRemoveCategory = function(id) {
+      removeCategory({ id }).then(data => {
+        root.$message.success(data.message);
+        categoryList.value = categoryList.value.filter(c => {
+          return c.id != id;
+        });
+      });
+    };
+
     onMounted(() => {
       sendGetCategory();
     });
     return {
+      sendRemoveCategory,
+      revise,
       categoryList,
       addCategory,
       formLabelAlign

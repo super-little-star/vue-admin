@@ -15,3 +15,20 @@ export function getCategory() {
   };
   return service.request(d);
 }
+
+export function reviseCategory(data) {
+  let d = {
+    method: "post",
+    url: "/news/reviseCategory",
+    data
+  };
+  return service.request(d);
+}
+export function removeCategory(data) {
+  let d = {
+    method: "post",
+    url: "/news/removeCategory",
+    data
+  };
+  return service.request(d);
+}
