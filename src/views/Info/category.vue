@@ -9,6 +9,9 @@
     <div>
       <el-row :gutter="30">
         <el-col :span="10">
+          <div class="tips" v-show="categoryList.length <= 0">
+            <h4>暂无分类，请手动添加</h4>
+          </div>
           <div class="category-wrap">
             <div
               class="category"
@@ -158,7 +161,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tips {
+  text-align: center;
+}
 .category-wrap {
+  height: 80vh;
+  overflow: scroll;
   :first-child {
     &::before {
       top: 20px;
