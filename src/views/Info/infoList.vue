@@ -46,7 +46,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table :data="tableData" border style="width: 100%" height="500">
       <el-table-column type="selection" width="40"> </el-table-column>
       <el-table-column prop="title" label="标题"> </el-table-column>
       <el-table-column prop="type" label="类型" width="130"> </el-table-column>
@@ -56,16 +56,11 @@
 
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="success"
-            @click="handleEdit(scope.$index, scope.row)"
-            >编辑</el-button
-          >
+          <el-button size="mini" type="success">编辑</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
+            @click="delEvent(scope.$index, scope.row)"
             >删除</el-button
           >
         </template>
@@ -73,7 +68,9 @@
     </el-table>
 
     <el-row class="bottom">
-      <el-col :span="8"><el-button>批量删除</el-button></el-col>
+      <el-col :span="8"
+        ><el-button @click="delAllEvent">批量删除</el-button></el-col
+      >
       <el-col :span="16"
         ><el-pagination
           class="pull-right"
@@ -95,7 +92,7 @@ import addInfoDialog from "@c/Info/addInfoDialog";
 export default {
   name: "infolist",
   components: { addInfoDialog },
-  setup() {
+  setup(props, { root }) {
     //搜索表单
     const searchFormInline = reactive({
       type: "",
@@ -191,18 +188,103 @@ export default {
         type: "国内信息",
         date: "2016-05-02",
         manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
+      },
+      {
+        title: "上海市普陀区金沙江路 1518 弄",
+        type: "国内信息",
+        date: "2016-05-02",
+        manager: "王小虎"
       }
     ]);
+
+    //弹窗
+    const dialogVisible = ref(false);
 
     //分页
     const handleCurrentChange = val => {
       console.log(val);
     };
 
-    //弹窗
-    const dialogVisible = ref(false);
-
+    //MessageBox
+    const delEvent = function(index, row) {
+      root
+        .MsgBoxTips("是否删除该信息？")
+        .then(() => {
+          root.$message.success("删除成功");
+          console.log(index);
+          console.log(row);
+        })
+        .catch(() => {
+          root.$message.info("已取消删除");
+        });
+    };
+    const delAllEvent = function() {
+      root
+        .MsgBoxTips("是否删除全部信息？")
+        .then(() => {
+          root.$message.success("删除成功");
+        })
+        .catch(() => {
+          root.$message.info("已取消删除");
+        });
+    };
     return {
+      delAllEvent,
+      delEvent,
       dialogVisible,
       typeOptions,
       typeValue,
