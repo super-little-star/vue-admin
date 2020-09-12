@@ -1,4 +1,6 @@
 import axios from "axios";
+import { GetToken, GetUserId, GetUserEmail } from "./app";
+import router from "../router";
 
 const service = axios.create({
   baseURL: "http://localhost:3000",
@@ -16,6 +18,9 @@ const service = axios.create({
 //添加请求拦截器
 service.interceptors.request.use(
   function(config) {
+    config.headers["token"] = GetToken();
+    config.headers["userid"] = GetUserId();
+    config.headers["uesremail"] = GetUserEmail();
     //发送前
     return config;
   },

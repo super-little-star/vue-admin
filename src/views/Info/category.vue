@@ -3,26 +3,30 @@
     <div
       style="padding-bottom:10px;margin-bottom:10px;border-bottom: 1px solid #eee;"
     >
-      <el-button type="danger">添加一级分类</el-button>
+      <el-button type="danger">添加分类</el-button>
     </div>
 
     <div>
       <el-row :gutter="30">
         <el-col :span="10">
           <div class="category-wrap">
-            <div class="category">
+            <div
+              class="category"
+              v-for="(item, index) in categoryList"
+              :key="index"
+            >
               <h4>
                 <svg-icon iconClass="plus" className="plus"></svg-icon>
-                新闻
+                {{ item.txt }}
                 <div class="btn-group">
                   <el-button type="danger" size="mini" round>编辑</el-button>
-                  <el-button type="success" size="mini" round
+                  <!-- <el-button type="success" size="mini" round
                     >添加子级</el-button
-                  >
+                  > -->
                   <el-button size="mini" round>删除</el-button>
                 </div>
               </h4>
-              <ul>
+              <!-- <ul>
                 <li>
                   国内
                   <div class="btn-group">
@@ -33,25 +37,13 @@
                 <li>国内</li>
                 <li>国内</li>
                 <li>国内</li>
-              </ul>
-            </div>
-            <div class="category">
-              <h4>
-                <svg-icon iconClass="plus" className="plus"></svg-icon>
-                新闻
-              </h4>
-              <ul>
-                <li>国内</li>
-                <li>国内</li>
-                <li>国内</li>
-                <li>国内</li>
-              </ul>
+              </ul> -->
             </div>
           </div>
         </el-col>
         <el-col :span="14">
           <h4 class="menu-title">
-            一级分类编辑
+            分类添加
           </h4>
           <el-form
             label-position="right"
@@ -59,14 +51,11 @@
             :model="formLabelAlign"
             class="w410"
           >
-            <el-form-item label="一级分类名称">
-              <el-input v-model="formLabelAlign.name"></el-input>
-            </el-form-item>
-            <el-form-item label="二级分类名称">
-              <el-input v-model="formLabelAlign.region"></el-input>
+            <el-form-item label="分类名称">
+              <el-input v-model="formLabelAlign.categoryName"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="danger">确定</el-button>
+              <el-button type="danger" @click="addCategory">确定</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -75,16 +64,44 @@
   </div>
 </template>
 <script>
-import { reactive } from "@vue/composition-api";
+import { onMounted, reactive, ref } from "@vue/composition-api";
+import { addFirstCategory, getCategory } from "@/api/Info";
 export default {
   name: "infoCategory",
-  setup() {
+  setup(props, { root }) {
     const formLabelAlign = reactive({
-      name: "",
-      region: "",
-      type: ""
+      categoryName: ""
+    });
+    const categoryList = ref([]);
+    const addCategory = function() {
+      if (formLabelAlign.categoryName == "") {
+        root.$message.warning("请输入分类名称");
+        return;
+      }
+      addFirstCategory({
+        categoryName: formLabelAlign.categoryName
+      })
+        .then(data => {
+          root.$message.success(data.message);
+          root.$router.push({ name: "infoCategory" });
+        })
+        .catch(data => {
+          root.$message.error(data.message);
+        });
+    };
+
+    const sendGetCategory = function() {
+      getCategory().then(data => {
+        categoryList.value = data.data;
+      });
+    };
+
+    onMounted(() => {
+      sendGetCategory();
     });
     return {
+      categoryList,
+      addCategory,
       formLabelAlign
     };
   }
