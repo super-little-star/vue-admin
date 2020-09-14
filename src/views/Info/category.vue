@@ -26,7 +26,7 @@
                     type="danger"
                     size="mini"
                     round
-                    @click="revise(item)"
+                    @click="revise(index)"
                     >编辑</el-button
                   >
                   <!-- <el-button type="success" size="mini" round
@@ -35,7 +35,7 @@
                   <template>
                     <el-popconfirm
                       title="确定删除次分类吗？"
-                      @onConfirm="sendRemoveCategory(item.id)"
+                      @onConfirm="sendRemoveCategory(index)"
                     >
                       <el-button slot="reference" size="mini" round
                         >删除</el-button
@@ -82,7 +82,14 @@
   </div>
 </template>
 <script>
-import { onMounted, reactive, ref } from "@vue/composition-api";
+import {
+  onMounted,
+  reactive,
+  ref,
+  watchEffect,
+  watch
+} from "@vue/composition-api";
+import { common } from "@/api/common";
 import {
   addFirstCategory,
   getCategory,
@@ -92,6 +99,7 @@ import {
 export default {
   name: "infoCategory",
   setup(props, { root }) {
+    const { getInfoCategory, category } = common();
     const formLabelAlign = reactive({
       categoryName: ""
     });
@@ -107,7 +115,7 @@ export default {
         .then(data => {
           root.$message.success(data.message);
           formLabelAlign.categoryName = "";
-          sendGetCategory();
+          category.item.push(data.data);
         })
         .catch(data => {
           root.$message.error(data.message);
@@ -115,36 +123,44 @@ export default {
     };
 
     const sendGetCategory = function() {
-      getCategory().then(data => {
-        categoryList.value = data.data;
-      });
+      getInfoCategory();
     };
 
-    const revise = function(cat) {
+    const revise = function(index) {
       root
-        .$prompt("修改分类：" + cat.txt, "提示", {
+        .$prompt("修改分类：" + category.item[index].txt, "提示", {
           confirmButtonText: "修改",
           cancelButtonText: "取消"
         })
         .then(({ value }) => {
           reviseCategory({
-            id: cat.id,
+            id: category.item[index].id,
             txt: value
-          }).then(data => {
-            root.$message.success(data.message);
-            cat.txt = value;
-          });
+          })
+            .then(data => {
+              root.$message.success(data.message);
+              category.item[index].txt = value;
+            })
+            .catch(data => {
+              root.$message.error(data.message);
+            });
         });
     };
 
-    const sendRemoveCategory = function(id) {
+    const sendRemoveCategory = function(index) {
+      let id = category.item[index].id;
       removeCategory({ id }).then(data => {
         root.$message.success(data.message);
-        categoryList.value = categoryList.value.filter(c => {
-          return c.id != id;
-        });
+        category.item.splice(index, 1);
       });
     };
+
+    watch(
+      () => category.item,
+      value => {
+        categoryList.value = value;
+      }
+    );
 
     onMounted(() => {
       sendGetCategory();

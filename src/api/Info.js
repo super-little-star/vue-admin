@@ -32,3 +32,39 @@ export function removeCategory(data) {
   };
   return service.request(d);
 }
+
+export function addInfo(data) {
+  let d = {
+    method: "post",
+    url: "/news/add",
+    data
+  };
+  return service.request(d);
+}
+
+export function getInfo(data) {
+  let d = {
+    method: "post",
+    url: "/news/getInfo",
+    data
+  };
+  return service.request(d);
+}
+
+export function removeInfo(data) {
+  let d = {
+    method: "post",
+    url: "/news/removeInfo",
+    data
+  };
+  return service.request(d);
+}
+
+export function reviseInfo(data) {
+  let d = {
+    method: "post",
+    url: "/news/reviseInfo",
+    data
+  };
+  return service.request(d);
+}

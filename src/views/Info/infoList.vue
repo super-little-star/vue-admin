@@ -2,12 +2,16 @@
   <div>
     <el-form :inline="true" :model="searchFormInline" class="searchForm">
       <el-form-item label="类型：" class="type">
-        <el-select v-model="typeValue" placeholder="请选择">
+        <el-select
+          v-model="typeValue"
+          placeholder="请选择"
+          @change="typeChange"
+        >
           <el-option
             v-for="item in typeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            :key="item.id"
+            :label="item.txt"
+            :value="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -40,27 +44,31 @@
         <el-button
           type="primary"
           icon="el-icon-plus"
-          @click="dialogVisible = true"
+          @click="
+            isInfoRevise = false;
+            dialogVisible = true;
+          "
           >添加</el-button
         >
       </el-form-item>
     </el-form>
 
-    <el-table :data="tableData" border style="width: 100%" height="500">
+    <el-table :data="tableData" border style="width: 100%" height="579">
       <el-table-column type="selection" width="40"> </el-table-column>
       <el-table-column prop="title" label="标题"> </el-table-column>
-      <el-table-column prop="type" label="类型" width="130"> </el-table-column>
-      <el-table-column prop="date" label="日期" width="137"> </el-table-column>
-      <el-table-column prop="manager" label="管理人" width="115">
-      </el-table-column>
+      <el-table-column
+        prop="categoryId"
+        label="类型"
+        width="130"
+      ></el-table-column>
+      <el-table-column prop="date" label="日期" width="150"> </el-table-column>
 
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
-          <el-button size="mini" type="success">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="delEvent(scope.$index, scope.row)"
+          <el-button size="mini" type="success" @click="revEvent(scope)"
+            >编辑</el-button
+          >
+          <el-button size="mini" type="danger" @click="delEvent(scope)"
             >删除</el-button
           >
         </template>
@@ -75,24 +83,37 @@
         ><el-pagination
           class="pull-right"
           background
+          :page-size="10"
+          :current-page.sync="currentPage"
           layout="total,jumper, prev, pager, next"
           @current-change="handleCurrentChange"
-          :total="1000"
+          :total="total"
         >
         </el-pagination
       ></el-col>
     </el-row>
 
-    <addInfoDialog :dialogVisible.sync="dialogVisible" />
+    <addInfoDialog
+      :isInfoRevise="isInfoRevise"
+      :dialogVisible.sync="dialogVisible"
+      :typeOptions="typeOptions"
+      :selectInfoData="selectInfoData"
+      @add="add"
+      @revise="revise"
+    />
   </div>
 </template>
 <script>
-import { reactive, ref } from "@vue/composition-api";
+import { onMounted, reactive, ref, watch } from "@vue/composition-api";
 import addInfoDialog from "@c/Info/addInfoDialog";
+import { common } from "@/api/common";
+import { addInfo, getInfo, removeInfo, reviseInfo } from "@/api/Info";
 export default {
   name: "infolist",
   components: { addInfoDialog },
   setup(props, { root }) {
+    const { getInfoCategory, category } = common();
+    const isInfoRevise = ref(false);
     //搜索表单
     const searchFormInline = reactive({
       type: "",
@@ -100,22 +121,14 @@ export default {
       keyword: "",
       content: ""
     });
+
     //类型选择器
-    const typeOptions = reactive([
-      {
-        value: 1,
-        label: "国际信息"
-      },
-      {
-        value: 2,
-        label: "国内信息"
-      },
-      {
-        value: 3,
-        label: "行业信息"
-      }
-    ]);
+    const typeOptions = ref([]);
     const typeValue = ref("");
+    const typeChange = function() {
+      console.log(typeValue.value);
+    };
+
     //关键字选择器
     const keywordOptions = reactive([
       {
@@ -128,6 +141,7 @@ export default {
       }
     ]);
     const keywordVal = ref("id");
+
     //日期选择器
     const pickerOptions = reactive({
       shortcuts: [
@@ -161,112 +175,35 @@ export default {
       ]
     });
     const dateValue = ref("");
+
     //输入内容
     const contentVal = ref("");
+
     //表格
-    const tableData = reactive([
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      },
-      {
-        title: "上海市普陀区金沙江路 1518 弄",
-        type: "国内信息",
-        date: "2016-05-02",
-        manager: "王小虎"
-      }
-    ]);
+    const tableData = ref([]);
 
     //弹窗
     const dialogVisible = ref(false);
 
     //分页
     const handleCurrentChange = val => {
-      console.log(val);
+      sendGetInfo();
     };
-
+    const total = ref(0);
+    const currentPage = ref(1);
     //MessageBox
-    const delEvent = function(index, row) {
+    const delEvent = function(scope) {
+      console.log(scope);
       root
         .MsgBoxTips("是否删除该信息？")
         .then(() => {
-          root.$message.success("删除成功");
-          console.log(index);
-          console.log(row);
+          removeInfo({
+            id: scope.row.id
+          }).then(data => {
+            root.$message.success(data.message);
+            if (tableData.value.length == 1) currentPage.value--;
+            sendGetInfo();
+          });
         })
         .catch(() => {
           root.$message.info("已取消删除");
@@ -282,7 +219,84 @@ export default {
           root.$message.info("已取消删除");
         });
     };
+
+    const selectInfoData = ref({});
+    const revEvent = function(scope) {
+      dialogVisible.value = true;
+      isInfoRevise.value = true;
+      selectInfoData.value = scope.row;
+      console.log(selectInfoData.value);
+    };
+    const revise = function(d) {
+      console.log(d);
+      reviseInfo(d).then(data => {
+        root.$message.success(data.message);
+        let r = tableData.value.find(t => {
+          return t.id == d.id;
+        });
+        r.title = d.title;
+        r.content = d.content;
+        r.categoryId = d.categoryId;
+      });
+    };
+
+    const add = function(d) {
+      isInfoRevise.value = false;
+      addInfo(d).then(data => {
+        root.$message.success(data.message);
+        if (tableData.value.length < 10) tableData.value.push(data.data);
+        total.value++;
+      });
+    };
+
+    const findCategoryTxt = function(id) {
+      let r = typeOptions.value.find(t => {
+        return t.id == id;
+      });
+      return r ? r.txt : "无";
+    };
+
+    const transInfo = function(d) {
+      return {
+        userId: d.userId,
+        id: d.id,
+        title: d.title,
+        category: findCategoryTxt(d.categoryId),
+        content: d.content
+      };
+    };
+
+    const sendGetInfo = function() {
+      getInfo({
+        page: currentPage.value
+      }).then(data => {
+        tableData.value = data.data.info;
+        total.value = data.data.count;
+      });
+    };
+
+    watch(
+      () => category.item,
+      value => {
+        typeOptions.value = value;
+      }
+    );
+
+    onMounted(() => {
+      sendGetInfo();
+      getInfoCategory();
+    });
+
     return {
+      typeChange,
+      currentPage,
+      total,
+      findCategoryTxt,
+      isInfoRevise,
+      selectInfoData,
+      revEvent,
+      revise,
+      add,
       delAllEvent,
       delEvent,
       dialogVisible,
