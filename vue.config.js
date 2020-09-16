@@ -27,6 +27,7 @@ module.exports = {
         "@c": path.resolve(__dirname, "./src/components"),
         "@v": path.resolve(__dirname, "./src/views"),
         "@s": path.resolve(__dirname, "./src/styles"),
+        "@u": path.resolve(__dirname, "./src/utils"),
         // eslint-disable-next-line prettier/prettier
         "vue": "vue/dist/vue.js"
       }
