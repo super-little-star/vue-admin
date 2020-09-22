@@ -25,14 +25,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="关键字" class="keyword">
-        <el-select v-model="keywordVal" placeholder="请选择">
-          <el-option
-            v-for="item in keywordOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
+        <mSelect :config="keywordOptions" :mSelect.sync="keywordVal" />
         <el-input v-model="contentVal" placeholder="请输入搜索内容"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="searchEvent"
           >搜索</el-button
@@ -70,11 +63,16 @@
       <el-table-column prop="date" label="日期" width="150" :formatter="toDate">
       </el-table-column>
 
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="300">
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="revEvent(scope)"
             >编辑</el-button
           >
+
+          <el-button size="mini" type="success" @click="detaEvent(scope.row)"
+            >信息详情</el-button
+          >
+
           <el-button size="mini" type="danger" @click="delEvent(scope)"
             >删除</el-button
           >
@@ -116,9 +114,10 @@ import addInfoDialog from "@c/Info/addInfoDialog";
 import { common } from "@/api/common";
 import { addInfo, getInfo, removeInfo, reviseInfo } from "@/api/Info";
 import { dateFormat } from "@u/dateTool";
+import mSelect from "@c/mySelect";
 export default {
   name: "infolist",
-  components: { addInfoDialog },
+  components: { addInfoDialog, mSelect },
   setup(props, { root }) {
     const { getInfoCategory, category } = common();
     const isInfoRevise = ref(false);
@@ -137,16 +136,9 @@ export default {
     const typeValue = ref(null);
 
     //关键字选择器
-    const keywordOptions = reactive([
-      {
-        value: "id",
-        label: "ID"
-      },
-      {
-        value: "title",
-        label: "标题"
-      }
-    ]);
+    const keywordOptions = reactive({
+      init: ["title", "id"]
+    });
     const keywordVal = ref("id");
 
     //日期选择器
@@ -244,6 +236,15 @@ export default {
       });
     };
 
+    const detaEvent = function(row) {
+      root.$router.push({
+        name: "detailInfo",
+        params: {
+          data: row
+        }
+      });
+    };
+
     const add = function(d) {
       isInfoRevise.value = false;
       addInfo(d).then(data => {
@@ -319,6 +320,7 @@ export default {
       () => category.item,
       value => {
         typeOptions.value = value;
+        root.$store.commit("info/SetCategory", typeOptions.value);
       }
     );
 
@@ -328,6 +330,7 @@ export default {
     });
 
     return {
+      detaEvent,
       searchEvent,
       isTableLoading,
       handleSelectionChange,

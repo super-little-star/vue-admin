@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GetToken, GetUserId, GetUserEmail } from "./app";
+import { GetData, Key, RemoveAllData } from "./app";
 import router from "../router";
 
 const service = axios.create({
@@ -18,9 +18,9 @@ const service = axios.create({
 //添加请求拦截器
 service.interceptors.request.use(
   function(config) {
-    config.headers["token"] = GetToken();
-    config.headers["userid"] = GetUserId();
-    config.headers["uesremail"] = GetUserEmail();
+    config.headers["token"] = GetData(Key.token);
+    config.headers["userid"] = GetData(Key.userId);
+    config.headers["uesremail"] = GetData(Key.userEmail);
     //发送前
     return config;
   },
@@ -35,6 +35,10 @@ service.interceptors.response.use(
     //响应数据处理
     let data = response.data;
     if (data.result == false) {
+      if (data.resCode == 1007) {
+        RemoveAllData();
+        router.push("/login");
+      }
       return Promise.reject(data);
     } else {
       return data;

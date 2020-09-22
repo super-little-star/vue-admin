@@ -1,50 +1,28 @@
-import cookie from "cookie_js";
+export var Key = {
+  token: "admin_token",
+  userEmail: "admin_userEmail",
+  userId: "admin_userId",
+  category: "admin_category",
+  infoData: "admin_infoData"
+};
 
-const Key_token = "admin_token";
-const Key_userEmail = "admin_userEmail";
-const Key_userId = "admin_userId";
-
-//Token
-export function GetToken() {
-  return cookie.get(Key_token);
+export function GetData(key) {
+  return sessionStorage.getItem(key);
 }
-export function SaveToken(token) {
-  cookie.set(Key_token, token);
+export function SaveData(key, value) {
+  if (value == null) value = [];
+  sessionStorage.setItem(key, JSON.stringify(value));
 }
-export function RemoveToken() {
-  cookie.remove(Key_token);
+export function RemoveData(key) {
+  sessionStorage.removeItem(key);
 }
-
-//UserEmail
-export function GetUserEmail() {
-  return cookie.get(Key_userEmail);
+export function RemoveAllData() {
+  for (let k in Key) {
+    sessionStorage.removeItem(Key[k]);
+  }
 }
-export function SaveUserEmail(email) {
-  cookie.set(Key_userEmail, email);
-}
-export function RemoveUserEmail(email) {
-  cookie.remove(Key_userEmail);
-}
-
-//UserId
-export function GetUserId() {
-  return cookie.get(Key_userId);
-}
-export function SaveUserId(id) {
-  cookie.set(Key_userId, id);
-}
-export function RemoveUserId() {
-  cookie.set(Key_userId);
-}
-
-//UserData
-export function SaveUserData(data) {
-  SaveToken(data.token);
-  SaveUserEmail(data.userEmail);
-  SaveUserId(data.userId);
-}
-export function RemoeUserData() {
-  RemoveToken();
-  RemoveUserEmail();
-  RemoveUserId();
+export function SaveAllData(data) {
+  for (let k in Key) {
+    sessionStorage.setItem(Key[k], data[k]);
+  }
 }

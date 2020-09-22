@@ -1,10 +1,10 @@
 import router from "@/router";
-import { GetToken } from "@/utils/app";
+import { GetData, Key } from "@/utils/app";
 
 const whiteRouter = ["/login"];
 
 router.beforeEach((to, from, next) => {
-  if (GetToken()) {
+  if (GetData(Key.token)) {
     next();
   } else {
     if (whiteRouter.indexOf(to.path) !== -1) next();

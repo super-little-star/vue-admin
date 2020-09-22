@@ -1,15 +1,22 @@
 import cookie from "cookie_js";
 import { Login } from "@/api/login";
-import { SaveUserData, GetUserEmail, GetUserId } from "@/utils/app";
+import {
+  SaveUserData,
+  GetUserEmail,
+  GetUserId,
+  GetData,
+  SaveAllData,
+  Key
+} from "@/utils/app";
 
 const state = {
   isCollapse:
     cookie.get("isCollapse") != null
       ? JSON.parse(cookie.get("isCollapse"))
       : false,
-  token: "",
-  userEmail: GetUserEmail() != null ? GetUserEmail() : "",
-  userId: GetUserId() != null ? GetUserId() : ""
+  token: "" || GetData(Key.token),
+  userEmail: "" || GetData(Key.userEmail),
+  userId: "" || GetData(Key.userId)
 };
 const mutations = {
   SetCollapse(state) {
@@ -35,7 +42,7 @@ const actions = {
           commit("SetToken", d.token);
           commit("SetUserEmail", d.userEmail);
           commit("SetUserId", d.userId);
-          SaveUserData(d);
+          SaveAllData(d);
           resolve(res);
         })
         .catch(error => {

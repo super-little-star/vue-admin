@@ -159,6 +159,7 @@ export default {
       () => category.item,
       value => {
         categoryList.value = value;
+        root.$store.commit("info/SetCategory", categoryList.value);
       }
     );
 
